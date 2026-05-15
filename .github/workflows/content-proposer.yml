@@ -1,0 +1,58 @@
+name: Content Proposer
+
+on:
+  schedule:
+    - cron: "0 14 * * 1" # Every Monday at 2pm UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  propose-content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Propose content with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            You are the content proposer for the co-authored website.
+
+            Review the existing posts in `content/blog/` and `content/human/` and the experiments in `src/app/experiments/` to understand what topics have already been covered.
+
+            Then propose 2-3 new content ideas by creating draft MDX files. For each:
+
+            1. Create the file in `content/blog/` with `draft: true` in the frontmatter
+            2. Use `author: ai`
+            3. Write the full post — not a stub. Make it good enough to publish if Doug approves.
+            4. Pick topics related to the site's themes: human-AI collaboration, agentic engineering, building in the open, developer tools, creative technology
+
+            Also consider proposing 1 experiment idea — if you do, scaffold the page component and register it in `src/lib/experiments.ts` with `draft: true`.
+
+            Use today's date. Follow the writing style in AGENTS.md.
+
+            Run `npm run build` to verify everything compiles.
+          create_pull_request: true
+          pr_base_branch: main
+          pr_title: "content: weekly proposals"
+          pr_body: |
+            Weekly content proposals from Claude.
+
+            Review the drafts. To publish, remove `draft: true` from the frontmatter and merge. To reject, close the PR.
+
+            Automated by Claude Code.

@@ -1,0 +1,58 @@
+name: News Scanner
+
+on:
+  schedule:
+    - cron: "0 13 * * 3,6" # Wednesday and Saturday at 1pm UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  scan-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Write news post with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_tools: "WebSearch,WebFetch"
+          direct_prompt: |
+            You are the news scanner for the co-authored website.
+
+            Search the web for recent news and developments in these areas:
+            - AI and LLMs (new models, capabilities, research)
+            - Agentic workflows and AI-assisted development
+            - Developer tools and engineering practices
+            - Creative technology and human-computer interaction
+
+            Pick the most interesting story or development from the past few days. Write a blog post about it that:
+            - Explains what happened and why it matters
+            - Offers a perspective — don't just summarize, have a take
+            - Connects it to themes relevant to this site (human-AI collaboration, building in the open)
+            - Is 400-700 words
+
+            Create the post in `content/blog/` with `author: ai` and today's date.
+
+            Follow the writing style in AGENTS.md. Run `npm run build` to verify.
+          create_pull_request: true
+          pr_base_branch: main
+          pr_title: "news: [topic from today's scan]"
+          pr_body: |
+            News post from Claude's web scan.
+
+            Automated by Claude Code.

@@ -1,0 +1,53 @@
+name: Code Improver
+
+on:
+  schedule:
+    - cron: "0 15 * * 5" # Every Friday at 3pm UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  improve-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Improve code with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            You are the code improver for the co-authored website.
+
+            Review the codebase and look for concrete improvements. Focus on ONE of these areas per run (pick whichever has the most impactful opportunity right now):
+
+            1. **Accessibility**: Check components for missing aria labels, keyboard navigation, semantic HTML, color contrast
+            2. **Performance**: Look for unnecessary re-renders, missing image optimization, bundle size issues
+            3. **SEO**: Check meta tags, Open Graph tags, structured data, sitemap
+            4. **Design polish**: Improve spacing, typography, responsive behavior, hover states
+            5. **Code quality**: Simplify complex logic, remove dead code, improve type safety
+
+            Make focused, concrete changes — not a laundry list. One clear improvement is better than five half-done ones.
+
+            Run `npm run build` to verify. Run `npm run lint` to check for issues.
+          create_pull_request: true
+          pr_base_branch: main
+          pr_title: "improve: [brief description]"
+          pr_body: |
+            Weekly code improvement from Claude.
+
+            Automated by Claude Code.
