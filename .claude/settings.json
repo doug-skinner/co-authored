@@ -12,7 +12,12 @@
       "Bash(git -C /Users/dougskinner/brand/co-authored log --oneline -5)",
       "Bash(git -C /Users/dougskinner/brand/co-authored add .gitignore CLAUDE.md content/ eslint.config.mjs mdx-components.tsx next.config.ts package-lock.json package.json postcss.config.mjs public/ src/ tsconfig.json)",
       "Bash(git -C /Users/dougskinner/brand/co-authored commit -m ' *)",
-      "Bash(git -C /Users/dougskinner/brand/co-authored push origin main)"
+      "Bash(git -C /Users/dougskinner/brand/co-authored push origin main)",
+      "Bash(gh label *)",
+      "Bash(git -C /Users/dougskinner/brand/co-authored log --oneline -3)",
+      "Bash(git -C /Users/dougskinner/brand/co-authored add AGENTS.md .github/workflows/)",
+      "WebFetch(domain:github.blog)",
+      "Bash(gh run *)"
     ],
     "additionalDirectories": [
       "/private/tmp",
