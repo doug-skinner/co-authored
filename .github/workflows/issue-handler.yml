@@ -8,6 +8,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  id-token: write
 
 jobs:
   handle-issue:
@@ -32,15 +33,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          direct_prompt: |
+          label_trigger: ${{ github.event.label.name }}
+          prompt: |
             You are handling a GitHub issue for the co-authored website.
-
-            **Issue #${{ github.event.issue.number }}**: ${{ github.event.issue.title }}
-
-            **Label**: ${{ github.event.label.name }}
-
-            **Description**:
-            ${{ github.event.issue.body }}
+            The label on this issue is: ${{ github.event.label.name }}
 
             ## Instructions by label
 
@@ -60,10 +56,3 @@ jobs:
             Create a scaffolded MDX file in `content/human/` with the frontmatter filled in (`author: doug`) and a placeholder body that says "TODO: Doug writes this." Do NOT write the content — this is Doug's space.
 
             After making changes, run `npm run build` to make sure everything compiles.
-          create_pull_request: true
-          pr_base_branch: main
-          pr_title: "${{ github.event.label.name }}: ${{ github.event.issue.title }}"
-          pr_body: |
-            Resolves #${{ github.event.issue.number }}
-
-            Automated by Claude Code.
