@@ -1,8 +1,8 @@
 name: Dependency Updater
 
 on:
-  schedule:
-    - cron: "0 12 1 * *" # First of every month at noon UTC
+  # schedule:
+  #   - cron: "0 12 1 * *" # First of every month at noon UTC
   workflow_dispatch:
 
 permissions:

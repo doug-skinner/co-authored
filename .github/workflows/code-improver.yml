@@ -1,8 +1,8 @@
 name: Code Improver
 
 on:
-  schedule:
-    - cron: "0 15 * * 5" # Every Friday at 3pm UTC
+  # schedule:
+  #   - cron: "0 15 * * 5" # Every Friday at 3pm UTC
   workflow_dispatch:
 
 permissions:
